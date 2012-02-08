@@ -1,4 +1,7 @@
 #!/bin/bash
+
+debug=$3
+
 # add percona apt keys
 sudo gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
 sudo gpg -a --export CD2EFD2A | sudo apt-key add -
@@ -13,18 +16,21 @@ sudo apt-get update
 #yes|sudo apt-get -f install
 #sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install percona-server-server
 
-#WGET_PATH="https://s3-eu-west-1.amazonaws.com/static-hybris/percona-cluster"
-WGET_PATH="http://www.percona.com/downloads/Percona-XtraDB-Cluster/5.5.17-alpha22.1/deb/squeeze"
-#WGET_OPTIONS="--quiet"
+if [ "$debug" = "test" ]; then
+    cd /tmp
+else
+    #WGET_PATH="https://s3-eu-west-1.amazonaws.com/static-hybris/percona-cluster"
+    WGET_PATH="http://www.percona.com/downloads/Percona-XtraDB-Cluster/5.5.17-alpha22.1/deb/squeeze"
+    #WGET_OPTIONS="--quiet"
 
-# get percona alpha debs
-cd /tmp
-wget $WGET_OPTIONS $WGET_PATH/libmysqlclient18_5.5.17-22.1-3691.squeeze_amd64.deb
-wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-client-5.5_5.5.17-22.1-3691.squeeze_amd64.deb
-wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-common-5.5_5.5.17-22.1-3691.squeeze_all.deb
-wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-galera_0.1-1_amd64.deb
-wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-server-5.5_5.5.17-22.1-3691.squeeze_amd64.deb
-
+    # get percona alpha debs
+    cd /tmp
+    wget $WGET_OPTIONS $WGET_PATH/libmysqlclient18_5.5.17-22.1-3691.squeeze_amd64.deb
+    wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-client-5.5_5.5.17-22.1-3691.squeeze_amd64.deb
+    wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-common-5.5_5.5.17-22.1-3691.squeeze_all.deb
+    wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-galera_0.1-1_amd64.deb
+    wget $WGET_OPTIONS $WGET_PATH/percona-xtradb-cluster-server-5.5_5.5.17-22.1-3691.squeeze_amd64.deb
+fi
 
 
 # install percona server & cluster from debs
@@ -67,7 +73,9 @@ innodb_autoinc_lock_mode=2
 innodb_log_file_size=64M
 DELIM"
 
-sudo mkdir -p /mnt/data/mysql
-sudo mysql_install_db --datadir=/mnt/data/mysql
-sudo /usr/bin/mysqld_safe </dev/null > /tmp/mysql.out 2>&1 &
+sudo /etc/init.d/mysql restart
+
+#sudo mkdir -p /mnt/data/mysql
+#sudo mysql_install_db --datadir=/mnt/data/mysql
+#sudo /usr/bin/mysqld_safe </dev/null > /tmp/mysql.out 2>&1 &
 
