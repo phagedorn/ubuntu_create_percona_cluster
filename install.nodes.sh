@@ -8,15 +8,16 @@ ami="ami-09e3dc7d"
 keyName="namics"
 keyLocation=$KEYFILE
 region=EU-WEST-1
+debug="test"
 
-if [ "$1" = "debug" ]; then
-    echo DEBUG MODEUS
+if [ "$debug" = "test" ]; then
+    echo DEBUG MODE
     echo we will use preconfigured virtualbox instance
+    TEST_HOST="localhost"        
     SSH_PORT="2222"
-    
+    echo SET HOST AND PORT to $TEST_HOST : $SSH_PORT
 else
     rm ec2hosts.txt
-
     for (( c=1; c<=instance_count; c++ ))
     do
             echo Create Instance Number $c ...
@@ -30,15 +31,22 @@ else
 fi
 
 node=0
+if [ "$debug" = "test" ]; then
+    echo DEBUG MODE
+     scp -P $SSH_PORT $KEYFILE $SSHOPT install_debs.sh $REMOTEUSER@$TEST_HOST:/tmp
+     ssh -n -i $KEYFILE $SSHOPT $REMOTEUSER@$TEST_HOST bash /tmp/install_debs.sh $node $IPNODE
+else    
+    for host in `cat ec2hosts.txt`
+    do
+     let "node+=1"
+     if [ $node == 1 ]; then
+       IPNODE=$(ssh -p $SSH_PORT -i $KEYFILE $SSHOPT $REMOTEUSER@$host "/sbin/ifconfig eth0 " | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
+     fi
+     scp -P $SSH_PORT $KEYFILE $SSHOPT install_debs.sh $REMOTEUSER@$host:/tmp
+     ssh -n -i $KEYFILE $SSHOPT $REMOTEUSER@$host bash /tmp/install_debs.sh $node $IPNODE
+    done
+fi
 
-for host in `cat ec2hosts.txt`
-do
- let "node+=1"
- if [ $node == 1 ]; then
-   IPNODE=$(ssh -p $SSH_PORT -i $KEYFILE $SSHOPT $REMOTEUSER@$host "/sbin/ifconfig eth0 " | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
- fi
- scp -P $SSH_PORT $KEYFILE $SSHOPT install_debs.sh $REMOTEUSER@$host:/tmp
- ssh -n -i $KEYFILE $SSHOPT $REMOTEUSER@$host bash /tmp/install_debs.sh $node $IPNODE
-done
+
 
 
