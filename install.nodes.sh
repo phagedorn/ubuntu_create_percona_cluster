@@ -33,8 +33,8 @@ fi
 node=0
 if [ "$debug" = "test" ]; then
     echo DEBUG MODE
-     scp -P $SSH_PORT $KEYFILE $SSHOPT install_debs.sh $REMOTEUSER@$TEST_HOST:/tmp
-     ssh -n -i $KEYFILE $SSHOPT $REMOTEUSER@$TEST_HOST bash /tmp/install_debs.sh $node $IPNODE
+     scp -P $SSH_PORT install_debs.sh $REMOTEUSER@$TEST_HOST:/tmp
+     ssh -p $SSH_PORT $REMOTEUSER@$TEST_HOST bash /tmp/install_debs.sh $node $IPNODE $DEBUG
 else    
     for host in `cat ec2hosts.txt`
     do
