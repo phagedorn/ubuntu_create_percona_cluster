@@ -12,10 +12,10 @@ debug="test"
 
 if [ "$debug" = "test" ]; then
     echo DEBUG MODE
-    echo we will use preconfigured virtualbox instance
+    echo DEBUG MODE - we will use preconfigured virtualbox instance
     TEST_HOST="localhost"        
     SSH_PORT="2222"
-    echo SET HOST AND PORT to $TEST_HOST : $SSH_PORT
+    echo DEBUG MODE -  SET HOST AND PORT to $TEST_HOST : $SSH_PORT
 else
     rm ec2hosts.txt
     for (( c=1; c<=instance_count; c++ ))
@@ -32,9 +32,10 @@ fi
 
 node=0
 if [ "$debug" = "test" ]; then
-    echo DEBUG MODE
+     echo DEBUG MODE - copy install_deb.sh to target server
      scp -P $SSH_PORT install_debs.sh $REMOTEUSER@$TEST_HOST:/tmp
-     ssh -p $SSH_PORT $REMOTEUSER@$TEST_HOST bash /tmp/install_debs.sh $node $IPNODE $DEBUG
+     echo DEBUG MODE - connect to target server
+     ssh -n -p $SSH_PORT $REMOTEUSER@$TEST_HOST "bash /tmp/install_debs.sh $node $IPNODE $debug"
 else    
     for host in `cat ec2hosts.txt`
     do

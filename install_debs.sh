@@ -1,6 +1,8 @@
 #!/bin/bash
+#debug=$3
 
-debug=$3
+debug="test"
+
 
 # add percona apt keys
 sudo gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
@@ -17,6 +19,7 @@ sudo apt-get update
 #sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install percona-server-server
 
 if [ "$debug" = "test" ]; then
+    echo entering debug modus...
     cd /tmp
 else
     #WGET_PATH="https://s3-eu-west-1.amazonaws.com/static-hybris/percona-cluster"
